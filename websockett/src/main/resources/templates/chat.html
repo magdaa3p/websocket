@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"> 
+    <title>Examen 4bim</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Chat en Vivo</h2>
+        <div class="card">
+            <div class="card-body">
+                <div class="messageArea d-flex flex-column" id="messageArea"></div> 
+                <br>
+                <br>
+                <br>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Nombre de usuario:</label>
+                    <input type="text" class="form-control" id="username" placeholder="Introduce tu nombre" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="messageInput" class="form-label">Mensaje:</label>
+                    <input type="text" class="form-control" id="messageInput" placeholder="Introduce tu mensaje" required>
+                </div>
+                
+                <button onclick="sendMessage()" class="btn btn-primary mt-3">Enviar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    let socket = new WebSocket("ws://localhost:8080/chat");
+
+    socket.onopen = function() {
+        console.log("Conexión establecida");
+    };
+
+    socket.onmessage = function(event) {
+        let messageArea = document.getElementById("messageArea");
+        let messageDiv = document.createElement("div");
+        messageDiv.textContent = event.data;
+        messageArea.appendChild(messageDiv);
+        messageArea.scrollTop = messageArea.scrollHeight;
+    };
+
+    socket.onerror = function(event) {
+        console.error("Error en la conexión WebSocket:", event);
+    };
+
+    function sendMessage() {
+        let messageInput = document.getElementById("messageInput");
+        let message = messageInput.value.trim();
+
+        if (message === '') {
+            alert("Por favor, introduce un número o la palabra 'TOTAL'.");
+            return;
+        }
+
+        socket.send(message); // Enviar mensaje al servidor
+        messageInput.value = ''; // Limpiar el campo de entrada
+    }
+</script>
+</body>
+</html>
